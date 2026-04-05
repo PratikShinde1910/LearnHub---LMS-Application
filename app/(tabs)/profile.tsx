@@ -123,7 +123,6 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 30 }}
       >
-        {/* Profile Header */}
         <View style={styles.headerContainer}>
           <ProfileAvatar user={user} />
           
@@ -162,7 +161,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Progress Section */}
         {inProgressCourses.length > 0 && (
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
@@ -193,7 +191,6 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* Settings List */}
         <View style={{ paddingHorizontal: 20 }}>
           <Text style={styles.sectionLabel}>Preferences</Text>
           <SettingsItem
@@ -238,7 +235,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* App Version */}
         <Text style={styles.versionText}>
           LearnHub v1.0.0
         </Text>

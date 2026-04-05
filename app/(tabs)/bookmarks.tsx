@@ -54,7 +54,6 @@ export default function BookmarksScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Bookmarks</Text>
         <Text style={styles.headerSubtitle}>

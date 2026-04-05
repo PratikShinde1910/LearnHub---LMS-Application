@@ -10,8 +10,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ENROLLED_KEY = "lms_enrolled_courses";
 
-// ─── Context ──────────────────────────────────────────────────────────────
-
 interface EnrollmentContextValue {
   enrolledIds: string[];
   loading: boolean;
@@ -22,8 +20,6 @@ interface EnrollmentContextValue {
 
 const EnrollmentContext = createContext<EnrollmentContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────
-
 export function EnrollmentProvider({
   children,
 }: {
@@ -32,14 +28,12 @@ export function EnrollmentProvider({
   const [enrolledIds, setEnrolledIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load on mount
   useEffect(() => {
     (async () => {
       try {
         const stored = await AsyncStorage.getItem(ENROLLED_KEY);
         if (stored) setEnrolledIds(JSON.parse(stored) as string[]);
       } catch {
-        // Silent
       } finally {
         setLoading(false);
       }
@@ -49,9 +43,7 @@ export function EnrollmentProvider({
   const persist = useCallback(async (ids: string[]) => {
     try {
       await AsyncStorage.setItem(ENROLLED_KEY, JSON.stringify(ids));
-    } catch {
-      // Silent
-    }
+    } catch {}
   }, []);
 
   const enroll = useCallback(
@@ -88,8 +80,6 @@ export function EnrollmentProvider({
     </EnrollmentContext.Provider>
   );
 }
-
-// ─── Hook ─────────────────────────────────────────────────────────────────
 
 export function useEnrollment() {
   const ctx = useContext(EnrollmentContext);

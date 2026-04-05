@@ -36,7 +36,6 @@ export function useLogin() {
   const updateField = useCallback(
     (field: keyof LoginFormState, value: string) => {
       setForm((prev) => ({ ...prev, [field]: value }));
-      // Clear field error on change
       setErrors((prev) => ({ ...prev, [field]: undefined, general: undefined }));
     },
     []

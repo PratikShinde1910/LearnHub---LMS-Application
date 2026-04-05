@@ -16,9 +16,8 @@ export function useNotifications() {
       const history = await getNotificationHistory();
       setNotifications(history);
       setUnreadCount(history.filter(n => !n.isRead).length);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    } finally {
+    } catch {}
+    finally {
       setLoading(false);
     }
   }, []);
@@ -27,9 +26,7 @@ export function useNotifications() {
     try {
       await markAllNotificationsRead();
       await loadNotifications();
-    } catch (error) {
-      console.error('Error marking all as read:', error);
-    }
+    } catch {}
   }, [loadNotifications]);
 
   const clearAll = useCallback(async () => {
@@ -37,9 +34,7 @@ export function useNotifications() {
       await clearNotificationHistory();
       setNotifications([]);
       setUnreadCount(0);
-    } catch (error) {
-      console.error('Error clearing notifications:', error);
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {

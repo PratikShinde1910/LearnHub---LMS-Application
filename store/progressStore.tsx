@@ -10,10 +10,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PROGRESS_KEY = "lms_course_progress";
 
-// ─── Types ────────────────────────────────────────────────────────────────
-
 interface ProgressMap {
-  [courseId: string]: number; // 0–100
+  [courseId: string]: number;
 }
 
 interface ProgressContextValue {
@@ -25,8 +23,6 @@ interface ProgressContextValue {
 
 const ProgressContext = createContext<ProgressContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────
-
 export function ProgressProvider({
   children,
 }: {
@@ -34,24 +30,19 @@ export function ProgressProvider({
 }) {
   const [progressMap, setProgressMap] = useState<ProgressMap>({});
 
-  // Load on mount
   useEffect(() => {
     (async () => {
       try {
         const stored = await AsyncStorage.getItem(PROGRESS_KEY);
         if (stored) setProgressMap(JSON.parse(stored) as ProgressMap);
-      } catch {
-        // Silent
-      }
+      } catch {}
     })();
   }, []);
 
   const persist = useCallback(async (map: ProgressMap) => {
     try {
       await AsyncStorage.setItem(PROGRESS_KEY, JSON.stringify(map));
-    } catch {
-      // Silent
-    }
+    } catch {}
   }, []);
 
   const getProgress = useCallback(
@@ -89,8 +80,6 @@ export function ProgressProvider({
     </ProgressContext.Provider>
   );
 }
-
-// ─── Hook ─────────────────────────────────────────────────────────────────
 
 export function useCourseProgress() {
   const ctx = useContext(ProgressContext);

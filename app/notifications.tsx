@@ -64,7 +64,6 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="close" size={24} color="#F1F5F9" />

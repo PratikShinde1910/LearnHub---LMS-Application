@@ -1,7 +1,5 @@
 import api from "./api";
 
-// ─── Raw API Types ──────────────────────────────────────────────────────────
-
 interface RawProduct {
   id: number;
   title: string;
@@ -43,8 +41,6 @@ interface ApiEnvelope<T> {
   success: boolean;
 }
 
-// ─── Mapped Course Object ───────────────────────────────────────────────────
-
 export interface MappedCourse {
   id: string;
   title: string;
@@ -55,14 +51,11 @@ export interface MappedCourse {
   instructorAvatar: string;
   isBookmarked: boolean;
   
-  // Optional preserved properties for UI rendering
   discountPercentage?: number;
   rating?: number;
   domain: string;
   brand?: string;
 }
-
-// ─── Domain matching logic ──────────────────────────────────────────────────
 
 const DOMAINS = {
   Technology: ["phone", "laptop", "electronics", "ai", "software", "tech"],
@@ -80,11 +73,8 @@ export function mapDomain(raw: RawProduct): string {
     }
   }
   
-  // Default to Lifestyle or Technology if totally unknown
   return "Lifestyle";
 }
-
-// ─── API Functions ──────────────────────────────────────────────────────────
 
 export async function fetchProducts(
   page = 1,
@@ -122,8 +112,6 @@ export async function fetchProductById(
   }
 }
 
-// ─── Unified Mapper ─────────────────────────────────────────────────────────
-
 export function mapCourseData(
   product: RawProduct,
   user?: RawRandomUser
@@ -135,7 +123,6 @@ export function mapCourseData(
   let title = product.title;
   let description = product.description;
 
-  // Manual override for specific product as requested
   if (product.title === "Samsung Universe 9") {
     title = "Samsung S25 Ultra 5G";
     description = "Master the latest in mobile technology with the Galaxy S25 Ultra 5G. Featuring a 200MP camera, Snapdragon 8 Gen 4, and stunning 6.9-inch display.";
@@ -160,4 +147,3 @@ export function mapCourseData(
   };
 }
 
-// ─── The Combined Fetch was removed, moved to courseStore.tsx as per instructions ───

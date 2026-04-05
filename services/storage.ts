@@ -3,8 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import type { User } from "@/types";
 
-// ─── Token Storage ──────────────────────────────────────────────────────────
-
 const TOKEN_KEY = "lms_auth_token";
 const REFRESH_TOKEN_KEY = "lms_refresh_token";
 
@@ -47,9 +45,7 @@ export async function getToken(): Promise<string | null> {
 export async function removeToken(): Promise<void> {
   try {
     await secureDelete(TOKEN_KEY);
-  } catch {
-    // Ignore errors when deleting
-  }
+  } catch {}
 }
 
 export async function setRefreshToken(token: string): Promise<void> {
@@ -67,12 +63,8 @@ export async function getRefreshToken(): Promise<string | null> {
 export async function removeRefreshToken(): Promise<void> {
   try {
     await secureDelete(REFRESH_TOKEN_KEY);
-  } catch {
-    // Ignore errors when deleting
-  }
+  } catch {}
 }
-
-// ─── Async Storage (App Data) ───────────────────────────────────────────────
 
 const USER_KEY = "lms_user_data";
 const BOOKMARKS_KEY = "lms_bookmarks";
@@ -93,9 +85,7 @@ export async function getUserData(): Promise<User | null> {
 export async function removeUserData(): Promise<void> {
   try {
     await AsyncStorage.removeItem(USER_KEY);
-  } catch {
-    // Ignore
-  }
+  } catch {}
 }
 
 export async function getBookmarks(): Promise<string[]> {
@@ -111,8 +101,6 @@ export async function setBookmarks(ids: string[]): Promise<void> {
   await AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(ids));
 }
 
-// ─── Clear All ──────────────────────────────────────────────────────────────
-
 export async function clearAll(): Promise<void> {
   try {
     await Promise.all([
@@ -120,7 +108,5 @@ export async function clearAll(): Promise<void> {
       removeRefreshToken(),
       removeUserData(),
     ]);
-  } catch {
-    // Ignore errors during cleanup
-  }
+  } catch {}
 }

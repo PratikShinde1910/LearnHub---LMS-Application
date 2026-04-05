@@ -9,8 +9,6 @@ import React, {
 import { getBookmarks, setBookmarks } from "@/services/storage";
 import { scheduleBookmarkMilestoneNotification } from "@/services/notificationService";
 
-// ─── Context ──────────────────────────────────────────────────────────────
-
 interface BookmarkContextValue {
   bookmarkedIds: string[];
   loading: boolean;
@@ -19,8 +17,6 @@ interface BookmarkContextValue {
 }
 
 const BookmarkContext = createContext<BookmarkContextValue | null>(null);
-
-// ─── Provider ─────────────────────────────────────────────────────────────
 
 export function BookmarkProvider({ children }: { children: React.ReactNode }) {
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -35,13 +31,11 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
       const ids = await getBookmarks();
       setBookmarkedIds(ids);
     } catch {
-      // Silent
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Optimistic toggle — updates UI instantly, then persists
   const toggleBookmark = useCallback(
     (courseId: string) => {
       setBookmarkedIds((prev) => {
@@ -50,13 +44,10 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
           ? prev.filter((id) => id !== courseId)
           : [...prev, courseId];
 
-        // Fire-and-forget persist
         setBookmarks(updated).catch(() => {
-          // Rollback on persistence failure
           setBookmarkedIds(prev);
         });
 
-        // Trigger notification check ONLY if we just added a bookmark
         if (!isAlready) {
           scheduleBookmarkMilestoneNotification(updated.length);
         }
@@ -90,8 +81,6 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
     </BookmarkContext.Provider>
   );
 }
-
-// ─── Hook ─────────────────────────────────────────────────────────────────
 
 export function useBookmarksContext() {
   const ctx = useContext(BookmarkContext);

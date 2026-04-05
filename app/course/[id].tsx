@@ -65,7 +65,6 @@ export default function CourseDetailScreen() {
 
   const handleEnroll = async () => {
     setEnrollLoading(true);
-    // Simulate API delay
     setTimeout(async () => {
       await enroll(course.id);
       setEnrollLoading(false);
@@ -110,11 +109,9 @@ export default function CourseDetailScreen() {
           onBookmark={() => toggleBookmark(course.id)}
         />
 
-        {/* Course Info */}
         <View style={styles.infoContainer}>
           <Text style={styles.courseTitle}>{course.title}</Text>
 
-          {/* Instructor + Progress (if enrolled) */}
           <View style={styles.instructorRow}>
             <View style={styles.instructorInfo}>
               <Image
@@ -139,7 +136,6 @@ export default function CourseDetailScreen() {
             )}
           </View>
 
-          {/* Stats Row */}
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Ionicons name="star" size={16} color="#F59E0B" />
@@ -159,7 +155,6 @@ export default function CourseDetailScreen() {
             </View>
           </View>
 
-          {/* Price */}
           <View style={styles.priceRow}>
             <Text style={styles.priceMain}>
               ${discountedPrice.toFixed(2)}
@@ -178,7 +173,6 @@ export default function CourseDetailScreen() {
             ) : null}
           </View>
 
-          {/* Description */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>About This Course</Text>
             <Text style={styles.descriptionText}>
@@ -186,7 +180,6 @@ export default function CourseDetailScreen() {
             </Text>
           </View>
 
-          {/* Gallery - Disabled due to missing images in mapped DTO or cast to any */}
           {(course as any).images && (course as any).images.length > 1 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Course Preview</Text>
@@ -211,7 +204,6 @@ export default function CourseDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Bottom CTA */}
       <EnrollButton
         isEnrolled={enrolled}
         justEnrolled={justEnrolled}

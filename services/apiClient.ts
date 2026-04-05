@@ -8,11 +8,10 @@ import * as SecureStore from "expo-secure-store";
 import { ApiError } from "@/types/api";
 
 const BASE_URL = "https://api.freeapi.app";
-const TIMEOUT_MS = 10000; // 10 seconds
+const TIMEOUT_MS = 10000;
 const MAX_RETRIES = 3;
-const RETRY_DELAY_BASE_MS = 1000; // doubles each retry: 1s, 2s, 4s
+const RETRY_DELAY_BASE_MS = 1000;
 
-// Extend config to track retry count
 interface RetryConfig extends InternalAxiosRequestConfig {
   _retryCount?: number;
 }
@@ -26,7 +25,6 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// REQUEST interceptor (attach auth token)
 apiClient.interceptors.request.use(
   async (config: RetryConfig) => {
     try {
@@ -34,22 +32,18 @@ apiClient.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch {
-      // Safe to ignore if storage fails
-    }
+    } catch {}
     config._retryCount = config._retryCount ?? 0;
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// RESPONSE interceptor (retry logic + error mapping)
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     const config = error.config as RetryConfig;
 
-    // --- RETRY LOGIC ---
     const shouldRetry =
       config &&
       (config._retryCount ?? 0) < MAX_RETRIES &&
@@ -58,21 +52,18 @@ apiClient.interceptors.response.use(
     if (shouldRetry) {
       config._retryCount = (config._retryCount ?? 0) + 1;
 
-      // Exponential backoff: 1s, 2s, 4s
       const delay = RETRY_DELAY_BASE_MS * Math.pow(2, config._retryCount - 1);
       await sleep(delay);
 
-      return apiClient(config); // retry the request
+      return apiClient(config);
     }
 
-    // --- ERROR MAPPING ---
     throw mapApiError(error);
   }
 );
 
 function isRetryableError(error: AxiosError): boolean {
-  // Retry on: network errors, 408 timeout, 429 rate limit, 500-503 server errors
-  if (!error.response) return true; // network error
+  if (!error.response) return true;
   const { status } = error.response;
   return [408, 429, 500, 502, 503].includes(status);
 }

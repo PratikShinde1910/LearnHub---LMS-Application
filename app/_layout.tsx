@@ -19,7 +19,6 @@ import {
   handleNotificationResponse
 } from '../services/notificationService';
 
-// Set global notification handler:
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -30,10 +29,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// Prevent the splash screen from auto-hiding
-SplashScreen.preventAutoHideAsync().catch(() => {
-  // Ignore errors — splash screen may not be available
-});
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function AppLayout() {
   const { loading } = useAuth();
@@ -42,21 +38,14 @@ function AppLayout() {
 
   useEffect(() => {
     if (!loading) {
-      SplashScreen.hideAsync().catch(() => {
-        // Ignore
-      });
+      SplashScreen.hideAsync().catch(() => {});
     }
 
-    // Initialize notifications
-    // @ts-ignore
     handleRequestPermissions();
-    // @ts-ignore
     handleScheduleReEngagement();
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener(notification => {
-        console.log('Notification received:', notification);
-      });
+      Notifications.addNotificationReceivedListener(() => {});
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener(
@@ -68,7 +57,6 @@ function AppLayout() {
       (state: AppStateStatus) => {
         if (state === 'active') {
           updateLastOpenedAt();
-          // @ts-ignore
           handleScheduleReEngagement();
         }
       }
@@ -81,8 +69,6 @@ function AppLayout() {
     };
   }, [loading]);
 
-  // Show a loading indicator with pure inline styles (not NativeWind)
-  // so it always renders regardless of styling setup
   if (loading) {
     return (
       <View style={styles.loadingContainer}>

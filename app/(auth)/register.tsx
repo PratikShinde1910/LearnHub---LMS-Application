@@ -51,7 +51,6 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo & Branding */}
           <View style={styles.brandContainer}>
             <View style={styles.logoBox}>
               <Ionicons
@@ -66,7 +65,6 @@ export default function RegisterScreen() {
             </Text>
           </View>
 
-          {/* Error Message */}
           {errors.general && (
             <View style={styles.errorBox}>
               <Ionicons
@@ -79,7 +77,6 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Form */}
           <Input
             label="Username"
             value={form.username}
@@ -118,7 +115,6 @@ export default function RegisterScreen() {
             testID="register-password-input"
           />
 
-          {/* Register Button */}
           <View style={{ marginTop: 16 }}>
             <Button
               title="Create Account"
@@ -130,7 +126,6 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Login Link */}
           <View style={styles.linkRow}>
             <Text style={styles.linkText}>
               Already have an account?{" "}

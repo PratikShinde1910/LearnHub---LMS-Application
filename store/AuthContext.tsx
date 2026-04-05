@@ -21,15 +21,11 @@ import {
   clearAll,
 } from "@/services/storage";
 
-// ─── Actions ─────────────────────────────────────────────────────────────────
-
 type AuthAction =
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
   | { type: "LOGOUT" }
   | { type: "RESTORE_SESSION"; payload: { user: User; token: string } };
-
-// ─── Reducer ─────────────────────────────────────────────────────────────────
 
 const initialState: AuthState = {
   user: null,
@@ -68,8 +64,6 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
   }
 }
 
-// ─── Context ─────────────────────────────────────────────────────────────────
-
 export interface AuthContextValue extends AuthState {
   login: (credentials: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
@@ -78,25 +72,19 @@ export interface AuthContextValue extends AuthState {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ─── Provider ────────────────────────────────────────────────────────────────
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const isLoginInProgress = useRef(false);
 
-  // Restore session on mount
   useEffect(() => {
     let isMounted = true;
 
     async function restoreSession() {
       try {
-        console.log("[Auth] Restoring session...");
         const token = await getToken();
-        console.log("[Auth] Token found:", !!token);
 
         if (!token) {
           if (isMounted) {
-            console.log("[Auth] No token, setting loading false");
             dispatch({ type: "SET_LOADING", payload: false });
           }
           return;
@@ -105,8 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const user = await getCurrentUser();
           if (isMounted) {
-            console.log("[Auth] Session restored for:", user.username);
-            // Set default header for all subsequent requests
             api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             dispatch({
               type: "RESTORE_SESSION",
@@ -114,14 +100,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
           }
         } catch {
-          // Token invalid or expired
-          console.log("[Auth] Token invalid, clearing...");
           await clearAll();
           if (isMounted) dispatch({ type: "LOGOUT" });
         }
-      } catch (error) {
-        // Catch-all for any storage errors
-        console.log("[Auth] Error during restore:", error);
+      } catch {
         if (isMounted) dispatch({ type: "SET_LOADING", payload: false });
       }
     }
@@ -173,7 +155,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     dispatch({ type: "SET_LOADING", payload: true });
     await clearAll();
-    // Clear default header immediately
     delete api.defaults.headers.common["Authorization"];
     dispatch({ type: "LOGOUT" });
   }, []);

@@ -25,8 +25,6 @@ import type { MappedCourse } from "@/services/courseService";
 import { ErrorView } from "@/components/ErrorView";
 import { ApiError } from "@/types/api";
 
-// ─── Category config ──────────────────────────────────────────────────────
-
 const DOMAINS = [
   { id: "Technology", label: "Technology", icon: "hardware-chip" as const, colors: ["#4F46E5", "#6366F1"] as readonly [string, string] },
   { id: "Design", label: "Design", icon: "color-palette" as const, colors: ["#F59E0B", "#FCD34D"] as readonly [string, string] },
@@ -42,8 +40,6 @@ export default function HomeScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ─── Filtered courses ──────────────────────────────────────────────────
-
   const filteredCourses = useMemo(() => {
     if (!searchQuery.trim()) return courses;
     const q = searchQuery.toLowerCase().trim();
@@ -53,8 +49,6 @@ export default function HomeScreen() {
         c.instructorName.toLowerCase().includes(q)
     );
   }, [courses, searchQuery]);
-
-  // ─── Callbacks ─────────────────────────────────────────────────────────
 
   const handleCoursePress = useCallback((course: MappedCourse) => {
     router.push({
@@ -79,8 +73,6 @@ export default function HomeScreen() {
       loadMoreCourses();
     }
   }, [hasMore, loading, loadMoreCourses]);
-
-  // ─── Render helpers ────────────────────────────────────────────────────
 
   const renderCourseItem = useCallback(
     ({ item }: { item: MappedCourse }) => (
@@ -127,18 +119,13 @@ export default function HomeScreen() {
     );
   }, [loading, searchQuery]);
 
-  // ─── List header ──────────────────────────────────────────────────────
-
   const ListHeader = useMemo(
     () => (
       <>
-        {/* Header */}
         <Header user={user} />
 
-        {/* Search Bar */}
         <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
 
-        {/* Domain Cards */}
         {!searchQuery && (
           <View style={styles.domainsGrid}>
             {DOMAINS.map((domain) => (
@@ -156,7 +143,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Popular Courses (Horizontal) */}
         {!searchQuery && courses.length > 0 && (
           <View style={styles.popularSection}>
             <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginBottom: 12 }]}>Popular Courses</Text>
@@ -175,7 +161,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Section Title for vertical list */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
             {searchQuery
@@ -190,8 +175,6 @@ export default function HomeScreen() {
     ),
     [user, searchQuery, filteredCourses.length, courses, handleCoursePress, handleBookmark, isBookmarked]
   );
-
-  // ─── Loading / Error states ────────────────────────────────────────────
 
   if (loading && courses.length === 0) {
     return (
@@ -218,8 +201,6 @@ export default function HomeScreen() {
     );
   }
 
-  // ─── Main UI ──────────────────────────────────────────────────────────
-
   return (
     <SafeAreaView style={styles.safe}>
       <FlatList
@@ -241,12 +222,11 @@ export default function HomeScreen() {
         }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        // ─── Performance ─────────────────────────────────────────
         initialNumToRender={6}
         maxToRenderPerBatch={8}
         windowSize={10}
         removeClippedSubviews={true}
-        getItemLayout={undefined} // variable height
+        getItemLayout={undefined}
       />
     </SafeAreaView>
   );
@@ -271,7 +251,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   domainCard: {
-    width: "48%", // 2x2 grid roughly
+    width: "48%",
     height: 80,
     borderRadius: 16,
     overflow: "hidden",

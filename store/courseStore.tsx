@@ -15,11 +15,9 @@ import {
   type MappedCourse,
 } from "@/services/courseService";
 
-// ─── Types ────────────────────────────────────────────────────────────────
-
 interface CourseState {
   courses: MappedCourse[];
-  instructorPool: any[]; // cached user payload
+  instructorPool: any[];
   loading: boolean;
   refreshing: boolean;
   error: string | null;
@@ -37,8 +35,6 @@ type CourseAction =
   | { type: "SET_COURSES"; payload: MappedCourse[] };
 
 const CACHE_KEY = "lms_course_cache";
-
-// ─── Reducer ──────────────────────────────────────────────────────────────
 
 const initialState: CourseState = {
   courses: [],
@@ -92,8 +88,6 @@ function courseReducer(state: CourseState, action: CourseAction): CourseState {
   }
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────
-
 interface CourseContextValue extends CourseState {
   fetchCourses: () => Promise<void>;
   refreshCourses: () => Promise<void>;
@@ -103,19 +97,15 @@ interface CourseContextValue extends CourseState {
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────
-
 export function CourseProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(courseReducer, initialState);
   const instructorsRef = useRef<any[]>([]);
   const isFetchingRef = useRef(false);
 
-  // Cache courses for offline support
   const cacheCourses = useCallback(async (courses: MappedCourse[]) => {
     try {
       await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(courses));
     } catch {
-      // Silent
     }
   }, []);
 
@@ -128,27 +118,22 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Initial fetch
   const fetchCourses = useCallback(async () => {
     if (isFetchingRef.current) return;
     isFetchingRef.current = true;
     dispatch({ type: "FETCH_START" });
 
     try {
-      console.log("[DEBUG] Fetching products and users...");
       const [productResult, userResult] = await Promise.all([
         fetchProducts(1, 20),
         fetchInstructors(30),
       ]);
-      
-      console.log(`[DEBUG] Fetched ${productResult.products.length} products and ${userResult.length} users`);
+
       instructorsRef.current = userResult;
 
-      const courses = productResult.products.map((p, i) => 
+      const courses = productResult.products.map((p, i) =>
         mapCourseData(p, userResult[i % userResult.length])
       );
-      
-      console.log(`[DEBUG] First mapped course:`, courses[0]);
 
       dispatch({
         type: "FETCH_SUCCESS",
@@ -156,9 +141,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
       });
       await cacheCourses(courses);
     } catch (error) {
-      console.error("[DEBUG] Error fetching:", error);
       const message = error instanceof Error ? error.message : "Failed to load courses";
-      // Try loading from cache
       const cached = await loadCachedCourses();
       if (cached.length > 0) {
         dispatch({ type: "SET_COURSES", payload: cached });
@@ -170,7 +153,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cacheCourses, loadCachedCourses]);
 
-  // Pull to refresh
   const refreshCourses = useCallback(async () => {
     dispatch({ type: "REFRESH_START" });
     try {
@@ -195,7 +177,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cacheCourses]);
 
-  // Load more (pagination)
   const loadMoreCourses = useCallback(async () => {
     if (!state.hasMore || isFetchingRef.current) return;
     isFetchingRef.current = true;
@@ -215,29 +196,25 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
         type: "FETCH_MORE_SUCCESS",
         payload: { courses: newCourses, hasMore: productResult.hasMore, page: nextPage },
       });
-      // Update cache with all courses
       const allCourses = [...state.courses, ...newCourses];
       await cacheCourses(allCourses);
     } catch {
-      // Silent fail on load-more
     } finally {
       isFetchingRef.current = false;
     }
   }, [state.hasMore, state.page, state.courses, cacheCourses]);
 
-  // Auto-fetch on mount
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
 
   const getCoursesByDomain = useCallback((domain: string) => {
     let domainCourses = state.courses.filter((c) => c.domain === domain);
-    
+
     if (domainCourses.length < 5) {
       let needed = 5 - domainCourses.length;
       const otherCourses = state.courses.filter((c) => c.domain !== domain);
-      
-      // Closest matching via complementary domains
+
       const relatedDomain = 
         domain === "Technology" ? "Design" :
         domain === "Design" ? "Technology" :
@@ -273,8 +250,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     <CourseContext.Provider value={value}>{children}</CourseContext.Provider>
   );
 }
-
-// ─── Hook ─────────────────────────────────────────────────────────────────
 
 export function useCourses() {
   const ctx = useContext(CourseContext);

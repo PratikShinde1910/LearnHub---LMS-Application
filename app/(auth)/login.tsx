@@ -38,7 +38,6 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo & Branding */}
           <View style={styles.brandContainer}>
             <View style={styles.logoBox}>
               <Ionicons
@@ -53,7 +52,6 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          {/* Error Message */}
           {errors.general && (
             <View style={styles.errorBox}>
               <Ionicons
@@ -66,7 +64,6 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {/* Form */}
           <Input
             label="Username"
             value={form.username}
@@ -92,7 +89,6 @@ export default function LoginScreen() {
             testID="login-password-input"
           />
 
-          {/* Login Button */}
           <View style={{ marginTop: 16 }}>
             <Button
               title="Sign In"
@@ -103,7 +99,6 @@ export default function LoginScreen() {
             />
           </View>
 
-          {/* Register Link */}
           <View style={styles.linkRow}>
             <Text style={styles.linkText}>
               Don&apos;t have an account?{" "}

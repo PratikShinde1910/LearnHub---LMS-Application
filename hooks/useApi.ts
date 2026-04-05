@@ -8,9 +8,6 @@ interface UseApiState<T> {
   refresh: () => Promise<void>;
 }
 
-/**
- * Standardized data fetching hook that integrates with our custom apiClient
- */
 export function useApi<T>(
   fetchFn: () => Promise<T>,
   deps: any[] = []
@@ -27,7 +24,6 @@ export function useApi<T>(
       setData(result);
     } catch (err) {
       setError(err as ApiError);
-      // Optional: Clear data if needed, or keep last known good value
     } finally {
       setLoading(false);
     }

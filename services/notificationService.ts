@@ -17,9 +17,6 @@ export interface AppNotification {
 const HISTORY_KEY = 'notification_history';
 const MAX_HISTORY = 50;
 
-/**
- * 1. Request Notification Permissions
- */
 export async function requestNotificationPermissions(): Promise<boolean> {
   try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -49,15 +46,11 @@ export async function requestNotificationPermissions(): Promise<boolean> {
     }
 
     return granted;
-  } catch (error) {
-    console.error('Error requesting notification permissions:', error);
+  } catch {
     return false;
   }
 }
 
-/**
- * 2. Schedule Bookmark Milestone Notification (Exactly 5)
- */
 export async function scheduleBookmarkMilestoneNotification(
   bookmarkCount: number
 ): Promise<void> {
@@ -73,7 +66,7 @@ export async function scheduleBookmarkMilestoneNotification(
         body: "You've bookmarked 5 courses. Time to start learning!",
         data: { type: "BOOKMARK_MILESTONE", count: 5 } as any,
       },
-      trigger: null, // Immediate
+      trigger: null,
     });
 
     await saveNotificationToHistory({
@@ -85,14 +78,10 @@ export async function scheduleBookmarkMilestoneNotification(
     });
 
     await AsyncStorage.setItem(NOTIFICATION_KEYS.MILESTONE_SENT, 'true');
-  } catch (error) {
-    console.error('Error scheduling milestone notification:', error);
+  } catch {
   }
 }
 
-/**
- * 3. Schedule Re-Engagement Notification (24h Inactivity)
- */
 export async function scheduleReEngagementNotification(): Promise<void> {
   try {
     const lastOpenedAt = await AsyncStorage.getItem(NOTIFICATION_KEYS.LAST_OPENED);
@@ -104,10 +93,7 @@ export async function scheduleReEngagementNotification(): Promise<void> {
     }
 
     const diff = now - new Date(lastOpenedAt).getTime();
-    
-    // TESTING: Change to 10 seconds for verification as per instructions
-    // PRODUCTION: 24 * 60 * 60 * 1000
-    const THRESHOLD = 10 * 1000; 
+    const THRESHOLD = 24 * 60 * 60 * 1000;
 
     if (diff >= THRESHOLD) {
       await Notifications.cancelAllScheduledNotificationsAsync();
@@ -133,25 +119,16 @@ export async function scheduleReEngagementNotification(): Promise<void> {
     }
 
     await updateLastOpenedAt();
-  } catch (error) {
-    console.error('Error scheduling re-engagement notification:', error);
+  } catch {
   }
 }
 
-/**
- * 4. Update Last Opened Timestamp
- */
 export async function updateLastOpenedAt(): Promise<void> {
   try {
     await AsyncStorage.setItem(NOTIFICATION_KEYS.LAST_OPENED, new Date().toISOString());
-  } catch (error) {
-    console.error('Error updating last opened timestamp:', error);
-  }
+  } catch {}
 }
 
-/**
- * 5. Handle Notification Response (Deep Linking)
- */
 export async function handleNotificationResponse(
   response: Notifications.NotificationResponse
 ): Promise<void> {
@@ -163,14 +140,9 @@ export async function handleNotificationResponse(
     } else if (data.type === 'RE_ENGAGEMENT') {
       router.push('/(tabs)/home');
     }
-  } catch (error) {
-    console.error('Error handling notification response:', error);
-  }
+  } catch {}
 }
 
-/**
- * 6. History Management
- */
 export async function getNotificationHistory(): Promise<AppNotification[]> {
   try {
     const raw = await AsyncStorage.getItem(HISTORY_KEY);
@@ -192,8 +164,7 @@ export async function saveNotificationToHistory(
     };
     const updated = [newNotif, ...existing].slice(0, MAX_HISTORY);
     await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-  } catch (error) {
-    console.error('Error saving notification history:', error);
+  } catch {
   }
 }
 
@@ -202,17 +173,13 @@ export async function markAllNotificationsRead(): Promise<void> {
     const history = await getNotificationHistory();
     const updated = history.map(n => ({ ...n, isRead: true }));
     await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-  } catch (error) {
-    console.error('Error marking all read:', error);
-  }
+  } catch {}
 }
 
 export async function clearNotificationHistory(): Promise<void> {
   try {
     await AsyncStorage.removeItem(HISTORY_KEY);
-  } catch (error) {
-    console.error('Error clearing history:', error);
-  }
+  } catch {}
 }
 
 export async function markAsRead(id: string): Promise<void> {
@@ -222,7 +189,5 @@ export async function markAsRead(id: string): Promise<void> {
       n.id === id ? { ...n, isRead: true } : n
     );
     await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-  } catch (error) {
-    console.error('Error marking single as read:', error);
-  }
+  } catch {}
 }
